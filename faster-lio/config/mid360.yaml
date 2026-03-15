@@ -1,0 +1,46 @@
+common:
+    lid_topic: "/livox/lidar2"  # 对应 rostopic list 中的转换后雷达话题
+    imu_topic: "/livox/imu"     # 对应 rostopic list 中的仿真 IMU 话题
+    time_sync_en: false       # 仿真环境通常不需要硬同步
+
+preprocess:
+    lidar_type: 1 # 1 for Livox serials LiDAR (CustomMsg format)
+    scan_line: 4
+    blind: 0.1    # 仿真雷达最小距离是0.1，这里设为0.1避免过滤掉太多近处数据
+
+mapping:
+    acc_cov: 0.1
+    gyr_cov: 0.1
+    b_acc_cov: 0.0001
+    b_gyr_cov: 0.0001
+    fov_degree: 360
+    det_range: 100.0
+    extrinsic_est_en: false     # 关闭在线估计，使用我们计算好的固定外参
+    # 外参计算 (LiDAR 坐标系相对于 IMU 坐标系的位置):
+    # IMU位置 (imu_base_link): x=0.28, z=0.115
+    # 雷达位置 (laser_livox):  x=0.23, z=0.11
+    # 差值 (Radar - IMU):      x = 0.23 - 0.28 = -0.05
+    #                          z = 0.11 - 0.115 = -0.005
+    extrinsic_T: [-0.05, 0.0, -0.005] 
+    extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1] # 旋转一致，单位矩阵
+
+publish:
+    path_publish_en: true
+    scan_publish_en: true
+    dense_publish_en: false
+    scan_bodyframe_pub_en: false
+
+pcd_save:
+    pcd_save_en: false          # 建议先关闭，避免仿真跑久了占用大量内存
+    interval: -1
+
+feature_extract_enable: false
+point_filter_num: 1
+max_iteration: 3
+filter_size_surf: 0.1
+filter_size_map: 0.3
+cube_side_length: 1000
+
+ivox_grid_resolution: 0.1
+ivox_nearby_type: 18
+esti_plane_threshold: 0.1
